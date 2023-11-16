@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/alexapps/url-shortener/internal/config"
+	"github.com/alexapps/url-shortener/internal/lib/sl"
+	"github.com/alexapps/url-shortener/internal/storage/sqlite"
 )
 
 const (
@@ -23,7 +25,15 @@ func main() {
 	log.Info("starting url shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
-	// TODO: storage: sqllite
+	// storage: sqllite
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("failed to init storage", sl.Err(err))
+		os.Exit(1)
+	}
+
+	// stub
+	_ = storage
 
 	// TODO: router: chi, "chi render"
 
