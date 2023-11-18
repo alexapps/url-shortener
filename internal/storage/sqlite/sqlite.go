@@ -21,6 +21,7 @@ const (
 
 	INSERT_INTO_Q = `INSERT INTO url(url, alias) VALUES(?, ?)`
 	GET_URL_Q     = `SELECT url FROM url WHERE alias = ?`
+	DELETE_URL_Q  = `DELETE FROM url WHERE alias = ?`
 )
 
 type Storage struct {
@@ -94,4 +95,19 @@ func (s *Storage) GetURL(alias string) (string, error) {
 	}
 
 	return resURL, nil
+}
+
+func (s *Storage) DeleteURL(alias string) error {
+	const op = "storage.sqlie.DeleteURL"
+
+	stmt, err := s.db.Prepare(DELETE_URL_Q)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	_, err = stmt.Exec(alias)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	return err
 }

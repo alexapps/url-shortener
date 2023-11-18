@@ -32,6 +32,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = storage.DeleteURL("google")
+	if err != nil {
+		log.Error("failed to delete url", sl.Err(err))
+		os.Exit(1)
+	}
+
 	// stub
 	_ = storage
 
