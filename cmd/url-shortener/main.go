@@ -2,12 +2,14 @@ package main
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/alexapps/url-shortener/internal/config"
+	"github.com/alexapps/url-shortener/internal/http-server/handlers/url/save"
 	mwLogger "github.com/alexapps/url-shortener/internal/http-server/middleware/logger"
 	"github.com/alexapps/url-shortener/internal/lib/logger/handlers/slogpretty"
 	"github.com/alexapps/url-shortener/internal/lib/logger/sl"
@@ -43,9 +45,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// stub
-	_ = storage
-
 	// router: chi, "chi render"
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
@@ -54,7 +53,22 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	_ = router
+	router.Post("/url", save.New(log, storage))
+
+	log.Info("starting server", slog.String("address", cfg.Address))
+
+	srv := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.Timeout,
+		WriteTimeout: cfg.Timeout,
+		IdleTimeout:  cfg.IdleTimeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
+	log.Error("server stopped")
 
 	// router.Use(mi)
 
