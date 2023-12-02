@@ -34,6 +34,8 @@ type Response struct {
 }
 
 // URLSaver is a interface that is implemented in the storage part
+//
+//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=URLSaver
 type URLSaver interface {
 	SaveURL(url string, alias string) (int64, error)
 }
