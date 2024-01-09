@@ -54,7 +54,21 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/url", save.New(log, storage))
+	// router group w/Auth covers the requests that should be under the login
+	router.Route("/url", func(r chi.Router) {
+		r.Use(middleware.BasicAuth("url-shortener", map[string]string{
+			// user:password
+			// TODO: add rights, sing-in, etc
+			cfg.HTTPServer.User: cfg.HTTPServer.Password,
+		}))
+		r.Post("/", save.New(log, storage))
+		// TODO
+		// router.Delete("/{alias}", remove.New(log, storage))
+	})
+
+	// e.g. POST http://localhost:8082/url w/body{"url":"http:\\gteam.net"}
+	// router.Post("/url", save.New(log, storage))
+
 	router.Get("/{alias}", redirect.New(log, storage))
 
 	log.Info("starting server", slog.String("address", cfg.Address))
