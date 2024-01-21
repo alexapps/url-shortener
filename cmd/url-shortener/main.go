@@ -10,6 +10,7 @@ import (
 
 	"github.com/alexapps/url-shortener/internal/config"
 	"github.com/alexapps/url-shortener/internal/http-server/handlers/redirect"
+	"github.com/alexapps/url-shortener/internal/http-server/handlers/url/remove"
 	"github.com/alexapps/url-shortener/internal/http-server/handlers/url/save"
 	mwLogger "github.com/alexapps/url-shortener/internal/http-server/middleware/logger"
 	"github.com/alexapps/url-shortener/internal/lib/logger/handlers/slogpretty"
@@ -62,8 +63,7 @@ func main() {
 			cfg.HTTPServer.User: cfg.HTTPServer.Password,
 		}))
 		r.Post("/", save.New(log, storage))
-		// TODO
-		// router.Delete("/{alias}", remove.New(log, storage))
+		r.Delete("/{alias}", remove.New(log, storage))
 	})
 
 	// e.g. POST http://localhost:8082/url w/body{"url":"http:\\gteam.net"}
